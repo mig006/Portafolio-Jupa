@@ -6,7 +6,7 @@ const featuredWorks = [
     title: 'Nacido verde',
     year: '2026',
     format: 'Afiche / collage',
-    note: 'Devocion popular, tipografia comprimida y color de estadio.',
+    note: 'Devoción popular, tipografía comprimida y color de estadio.',
     image: '/art/nacido-verde.png',
     tone: 'acid',
   },
@@ -21,8 +21,8 @@ const featuredWorks = [
   {
     title: 'Bestiario calabaza',
     year: '2025',
-    format: 'Ilustracion',
-    note: 'Linea negra, humor siniestro y personaje de feria.',
+    format: 'Ilustración',
+    note: 'Línea negra, humor siniestro y personaje de feria.',
     image: '/art/bestiario-calabaza.png',
     tone: 'ember',
   },
@@ -30,7 +30,7 @@ const featuredWorks = [
     title: 'Ritual de ceniza',
     year: '2025',
     format: 'Print',
-    note: 'Figura cadaverica, simbolos totemicos y contraste brutal.',
+    note: 'Figura cadavérica, símbolos totémicos y contraste brutal.',
     image: '/art/ritual-ceniza.png',
     tone: 'lava',
   },
@@ -38,7 +38,7 @@ const featuredWorks = [
     title: 'Hike demon',
     year: '2025',
     format: 'Sticker / character',
-    note: 'Bestia magenta con acentos toxicos y postura torcida.',
+    note: 'Bestia magenta con acentos tóxicos y postura torcida.',
     image: '/art/hike-demon.png',
     tone: 'toxic',
   },
@@ -46,7 +46,7 @@ const featuredWorks = [
     title: 'Mirada violeta',
     year: '2024',
     format: 'Retrato digital',
-    note: 'Brillo espectral, piel nocturna y expresion cerrada.',
+    note: 'Brillo espectral, piel nocturna y expresión cerrada.',
     image: '/art/mirada-violeta.png',
     tone: 'violet',
   },
@@ -59,25 +59,25 @@ const featuredWorks = [
     tone: 'bubble',
   },
   {
-    title: 'Intervencion urbana',
+    title: 'Intervención urbana',
     year: '2024',
     format: 'Mural / objeto',
-    note: 'Escala publica, distorsion monstruosa y presencia callejera.',
+    note: 'Escala pública, distorsión monstruosa y presencia callejera.',
     image: '/art/intervencion-urbana.png',
     tone: 'sky',
   },
 ]
 
 const capabilities = [
-  'Ilustracion editorial',
+  'Ilustración editorial',
   'Personajes y monstruos',
   'Stickers, prints y afiches',
 ]
 
 const process = [
-  'Concepto rapido con referencias, ritmo visual y paleta.',
-  'Bocetos y direccion de personaje o composicion.',
-  'Entrega lista para red, print o montaje fisico.',
+  'Concepto rápido con referencias, ritmo visual y paleta.',
+  'Bocetos y dirección de personaje o composición.',
+  'Entrega lista para red, print o montaje físico.',
 ]
 
 const youtubeChannel = {
@@ -216,7 +216,7 @@ function App() {
           </div>
         </a>
 
-        <nav className="main-nav" aria-label="Navegacion principal">
+        <nav className="main-nav" aria-label="Navegación principal">
           <a href="#obras">Obras</a>
           <a href="#sobre">Perfil</a>
           <a href="#contacto">Contacto</a>
@@ -231,8 +231,8 @@ function App() {
               <p className="eyebrow">Portafolio visual</p>
               <h1>Arte crudo con personajes tensos.</h1>
               <p className="hero-text">
-                Ilustracion, pintura y piezas graficas con energia callejera,
-                humor oscuro y una identidad que mezcla devocion popular,
+                Ilustración, pintura y piezas gráficas con energía callejera,
+                humor oscuro y una identidad que mezcla devoción popular,
                 monstruos y color agresivo.
               </p>
 
@@ -277,8 +277,8 @@ function App() {
             </div>
             <div className="visual-panel visual-panel--note">
               <p>
-                Oscuro, ironico y visceral. Una mezcla de personaje, textura y
-                grafica popular.
+                Oscuro, irónico y visceral. Una mezcla de personaje, textura y
+                gráfica popular.
               </p>
             </div>
           </div>
@@ -286,8 +286,8 @@ function App() {
 
         <section className="manifesto-strip">
           <p>
-            Un lenguaje visual que cruza ilustracion, cultura popular, terror,
-            ternura rara y composicion editorial.
+            Un lenguaje visual que cruza ilustración, cultura popular, terror,
+            ternura rara y composición editorial.
           </p>
           <span>Disponible para 2026</span>
         </section>
@@ -310,20 +310,20 @@ function App() {
             <p className="eyebrow">Perfil</p>
             <h2>Una voz visual que no busca verse limpia.</h2>
             <p>
-              Jupa trabaja desde el personaje, la deformacion y el choque entre
+              Jupa trabaja desde el personaje, la deformación y el choque entre
               lo infantil y lo siniestro. El resultado no intenta agradar a
               todo el mundo: intenta dejar huella.
             </p>
             <p>
-              Este sitio esta planteado como una portada viva: texto directo,
-              piezas protagonistas y una atmosfera que acompana el universo de
+              Este sitio está planteado como una portada viva: texto directo,
+              piezas protagonistas y una atmósfera que acompaña el universo de
               la obra sin maquillarlo.
             </p>
           </article>
 
           <article className="story-card">
             <p className="eyebrow">Proceso</p>
-            <h2>Como se desarrolla una pieza</h2>
+            <h2>Cómo se desarrolla una pieza</h2>
             <ul className="stack-list">
               {process.map((item) => (
                 <li key={item}>{item}</li>
@@ -335,9 +335,9 @@ function App() {
             <p className="eyebrow">Enfoque</p>
             <h2>Formatos que encajan bien</h2>
             <ul className="stack-list">
-              <li>Campanas visuales con mucho caracter.</li>
+              <li>Campañas visuales con mucho carácter.</li>
               <li>Merch, sticker packs, posters y covers.</li>
-              <li>Murales, objetos intervenidos y piezas para exposicion.</li>
+              <li>Murales, objetos intervenidos y piezas para exposición.</li>
             </ul>
           </article>
         </section>
@@ -345,7 +345,7 @@ function App() {
         <section className="contact-section" id="contacto">
           <div>
             <p className="eyebrow">Contacto</p>
-            <h2>Si quieres una pieza con filo, aqui empieza la conversacion.</h2>
+            <h2>Si quieres una pieza con filo, aquí empieza la conversación.</h2>
           </div>
 
           <div className="contact-actions">
