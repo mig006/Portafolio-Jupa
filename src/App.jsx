@@ -8,7 +8,7 @@ import {
   supabaseContentTable,
 } from './lib/supabaseClient'
 
-const editorEnabled = import.meta.env.DEV || import.meta.env.VITE_ENABLE_EDITOR === 'true'
+const editorEnabled = import.meta.env.VITE_ENABLE_EDITOR === 'true'
 
 const toneOptions = ['acid', 'storm', 'ember', 'lava', 'toxic', 'violet', 'bubble', 'sky']
 
