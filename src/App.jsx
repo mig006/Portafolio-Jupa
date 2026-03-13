@@ -272,7 +272,7 @@ function App() {
               <p>Logo / avatar</p>
             </div>
             <div className="visual-panel visual-panel--quote">
-              <span>12+</span>
+              <span>50+</span>
               <p>Piezas con identidad propia listas para crecer en mural, print o feed.</p>
             </div>
             <div className="visual-panel visual-panel--note">
