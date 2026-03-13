@@ -1,0 +1,109 @@
+{
+  "featuredWorks": [
+    {
+      "title": "Nacido verde",
+      "year": "2026",
+      "format": "Afiche / collage",
+      "note": "Devoción popular, tipografía comprimida y color de estadio.",
+      "image": "/art/nacido-verde.png",
+      "tone": "acid"
+    },
+    {
+      "title": "Figura en ventana",
+      "year": "2025",
+      "format": "Pintura",
+      "note": "Silencio tenso, gesto suspendido y escena de barrio.",
+      "image": "/art/figura-ventana.png",
+      "tone": "storm"
+    },
+    {
+      "title": "Bestiario calabaza",
+      "year": "2025",
+      "format": "Ilustración",
+      "note": "Línea negra, humor siniestro y personaje de feria.",
+      "image": "/art/bestiario-calabaza.png",
+      "tone": "ember"
+    },
+    {
+      "title": "Ritual de ceniza",
+      "year": "2025",
+      "format": "Print",
+      "note": "Figura cadavérica, símbolos totémicos y contraste brutal.",
+      "image": "/art/ritual-ceniza.png",
+      "tone": "lava"
+    },
+    {
+      "title": "Hike demon",
+      "year": "2025",
+      "format": "Sticker / character",
+      "note": "Bestia magenta con acentos tóxicos y postura torcida.",
+      "image": "/art/hike-demon.png",
+      "tone": "toxic"
+    },
+    {
+      "title": "Mirada violeta",
+      "year": "2024",
+      "format": "Retrato digital",
+      "note": "Brillo espectral, piel nocturna y expresión cerrada.",
+      "image": "/art/mirada-violeta.png",
+      "tone": "violet"
+    },
+    {
+      "title": "Gemelos ciegos",
+      "year": "2024",
+      "format": "Serie de personajes",
+      "note": "Infancia inquietante con color plano y gestos afilados.",
+      "image": "/art/gemelos-ciegos.png",
+      "tone": "bubble"
+    },
+    {
+      "title": "Intervención urbana",
+      "year": "2024",
+      "format": "Mural / objeto",
+      "note": "Escala pública, distorsión monstruosa y presencia callejera.",
+      "image": "/art/intervencion-urbana.png",
+      "tone": "sky"
+    }
+  ],
+  "capabilities": [
+    "Ilustración editorial",
+    "Personajes y monstruos",
+    "Stickers, prints y afiches"
+  ],
+  "process": [
+    "Concepto rápido con referencias, ritmo visual y paleta.",
+    "Bocetos y dirección de personaje o composición.",
+    "Entrega lista para red, print o montaje físico."
+  ],
+  "youtubeChannel": {
+    "name": "Pablito",
+    "handle": "@pablito.d0cx",
+    "url": "https://www.youtube.com/@pablito.d0cx/videos"
+  },
+  "youtubeVideos": [
+    {
+      "title": "mi vida durante Enero",
+      "duration": "6:37",
+      "meta": "Video mensual",
+      "image": "/art/yt-enero.jpg",
+      "month": "enero",
+      "url": "https://www.youtube.com/watch?v=1aFqYiFUD28&t=6s"
+    },
+    {
+      "title": "mi vida durante Febrero",
+      "duration": "14:08",
+      "meta": "Video mensual",
+      "image": "/art/yt-febrero.jpg",
+      "month": "febrero",
+      "url": "https://www.youtube.com/watch?v=dYTlKRXqU1E&t=312s"
+    },
+    {
+      "title": "mi vida durante Marzo",
+      "duration": "40:52",
+      "meta": "Video mensual",
+      "image": "/art/yt-marzo.jpg",
+      "month": "marzo",
+      "url": "https://www.youtube.com/watch?v=_o5l8CGg0xs&t=1601s"
+    }
+  ]
+}

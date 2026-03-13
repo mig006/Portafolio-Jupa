@@ -1,16 +1,63 @@
-# React + Vite
+# Portafolio Jupa
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sitio hecho con React + Vite.
 
-Currently, two official plugins are available:
+## Comandos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- npm install
+- npm run dev
+- npm run build
 
-## React Compiler
+## Como funciona ahora
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- El publico ve contenido publicado desde Supabase.
+- El panel Admin (edicion) solo aparece si VITE_ENABLE_EDITOR=true.
+- Tu amigo entra con email y contraseña de Supabase, edita cards y pulsa Publicar cambios.
+- Lo publicado se ve en la URL publica para todos.
 
-## Expanding the ESLint configuration
+## Variables de entorno
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Copia .env.example a .env.local y configura:
+
+- VITE_ENABLE_EDITOR=false (publico)
+- VITE_SUPABASE_URL=...
+- VITE_SUPABASE_ANON_KEY=...
+- VITE_SUPABASE_CONTENT_TABLE=portfolio_content
+- VITE_SUPABASE_CONTENT_ID=main
+
+## Setup de Supabase
+
+1. Crea un proyecto en Supabase.
+2. En SQL Editor, ejecuta supabase/schema.sql.
+3. Cambia friend@example.com por el email real de tu amigo dentro del SQL.
+4. En Authentication > Users, crea usuario para tu amigo (email + password).
+5. Copia URL y anon key del proyecto y colocalas en variables de entorno.
+
+## Vercel recomendado (2 proyectos)
+
+### 1) Proyecto publico
+
+- VITE_ENABLE_EDITOR=false
+- Mismas variables de Supabase
+- Esta URL es la que compartes con todo el mundo.
+- No mostrara menu Admin ni formulario de edicion.
+
+### 2) Proyecto privado (solo tu amigo)
+
+- VITE_ENABLE_EDITOR=true
+- Mismas variables de Supabase
+- Comparte esta URL solo con tu amigo.
+- Tu amigo inicia sesion y publica sin tocar codigo.
+
+## Flujo para tu amigo
+
+1. Entra a la URL privada.
+2. Va a Admin.
+3. Inicia sesion.
+4. Agrega/edita/elimina cards.
+5. Pulsa Publicar cambios.
+6. Revisa la URL publica y ya se ven los cambios.
+
+## Fallback local
+
+Si Supabase no responde, la app muestra el contenido base de src/data/portfolioContent.json para no romper la landing.
