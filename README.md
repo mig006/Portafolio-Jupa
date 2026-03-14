@@ -1,65 +1,80 @@
-# Portafolio Jupa
+# Jupa Portfolio
 
-Sitio hecho con React + Vite.
+Plataforma de portafolio visual con gestión administrable de contenido y publicación centralizada en Supabase.
 
-## Comandos
+## Descripción del proyecto
 
-- npm install
-- npm run dev
-- npm run build
+Jupa Portfolio es una aplicación moderna construida con **React + Vite** que separa completamente la experiencia pública de visualización del contenido de la interfaz de administración privada. La plataforma permite a creadores visuales publicar sus obras sin depender de cambios en código.
 
-## Como funciona ahora
+### Características
 
-- El publico ve contenido publicado desde Supabase.
-- El panel Admin (edicion) solo aparece si VITE_ENABLE_EDITOR=true.
-- Tu amigo entra con email y contraseña de Supabase, edita cards y pulsa Publicar cambios.
-- En cada card puede subir su propia imagen desde el panel (sin escribir rutas manuales).
-- Lo publicado se ve en la URL publica para todos.
+- **Lectura pública del contenido**: Los visitantes ven obra publicada sincronizada desde Supabase en tiempo real.
+- **Panel de administración privado**: Editor visual para gestionar cards de obras, con contraseñas seguras almacenadas en Supabase Auth.
+- **Carga de imágenes integrada**: Los administradores pueden subir imágenes directamente desde el panel sin manejar rutas manuales.
+- **Publicación controlada**: Los cambios se guardan en borrador y se publican de forma consciente, dejando la URL pública con versiones estables.
+- **Fallback resiliente**: Si Supabase no responde, la app carga el contenido base local para no interrumpir la visualización.
+- **Diseño responsive**: Interfaz optimizada para desktop y móvil, incluyendo navegación desplegable en pantallas pequeñas.
 
-## Variables de entorno
+## Arquitectura
 
-Copia .env.example a .env.local y configura:
+La aplicación sigue un patrón de **arquitectura desacoplada**:
 
-- VITE_ENABLE_EDITOR=false (publico)
-- VITE_SUPABASE_URL=...
-- VITE_SUPABASE_ANON_KEY=...
-- VITE_SUPABASE_CONTENT_TABLE=portfolio_content
-- VITE_SUPABASE_CONTENT_ID=main
-- VITE_SUPABASE_IMAGE_BUCKET=portfolio-art
+- **Capa de presentación**: React renderiza contenido de forma dinámica según el estado de autenticación.
+- **Capa de datos**: Supabase almacena contenido publicado, credenciales de administradores e imágenes en Storage.
+- **Seguridad**: Row-Level Security (RLS) en bases de datos y políticas de almacenamiento restringen operaciones a administradores autenticados.
+- **CI/CD flexible**: Se soportan dos deployments independientes: una instancia pública (editor deshabilitado) y otra privada (editor habilitado).
 
-## Setup de Supabase
+## Tecnologías
 
-1. Crea un proyecto en Supabase.
-2. En SQL Editor, ejecuta supabase/schema.sql.
-3. Cambia friend@example.com por el email real de tu amigo dentro del SQL.
-4. En Authentication > Users, crea usuario para tu amigo (email + password).
-5. Copia URL y anon key del proyecto y colocalas en variables de entorno.
+- **Frontend**: React 19, Vite, CSS sin framework
+- **Backend & Base de datos**: Supabase (PostgreSQL, Auth, Storage)
+- **Scripting de infraestructura**: SQL para RLS y esquema
 
-## Vercel recomendado (2 proyectos)
+## Configuración
 
-### 1) Proyecto publico
+Copia `.env.example` a `.env.local` y configura:
 
-- VITE_ENABLE_EDITOR=false
-- Mismas variables de Supabase
-- Esta URL es la que compartes con todo el mundo.
-- No mostrara menu Admin ni formulario de edicion.
+```
+VITE_ENABLE_EDITOR=false                    # Activa/desactiva panel admin
+VITE_SUPABASE_URL=https://...               # URL del proyecto Supabase
+VITE_SUPABASE_ANON_KEY=...                  # Clave anónima publicable
+VITE_SUPABASE_CONTENT_TABLE=portfolio_content
+VITE_SUPABASE_CONTENT_ID=main
+VITE_SUPABASE_IMAGE_BUCKET=portfolio-art
+```
 
-### 2) Proyecto privado (solo tu amigo)
+## Instalación
 
-- VITE_ENABLE_EDITOR=true
-- Mismas variables de Supabase
-- Comparte esta URL solo con tu amigo.
-- Tu amigo inicia sesion y publica sin tocar codigo.
+```bash
+npm install
+npm run dev      # Desarrollo con hot reload
+npm run build    # Build para producción
+npm run preview  # Vista previa del build
+```
 
-## Flujo para tu amigo
+## Desarrollo
 
-1. Entra a la URL privada.
-2. Va a Admin.
-3. Inicia sesion.
-4. Agrega/edita/elimina cards.
-5. Pulsa Publicar cambios.
-6. Revisa la URL publica y ya se ven los cambios.
+Durante el desarrollo, se recomienda:
+- Fijar `VITE_ENABLE_EDITOR=true` en `.env.local` para acceder al panel.
+- Ejecutar `npm run dev` para trabajar con hot reload.
+- Testear una instancia pública sin el editor para validar fallback.
 
-## Fallback local
+## Despliegue
 
-Si Supabase no responde, la app muestra el contenido base de src/data/portfolioContent.json para no romper la landing.
+Se recomienda mantener dos proyectos en producción:
+
+| Propósito | Editor | Audiencia | Nota |
+|-----------|--------|-----------|------|
+| Pública | Deshabilitado | Visitantes | URL principal, visible para todos |
+| Administración | Habilitado | Admin | URL privada, compartida solo con editor |
+
+Ambas comparten la misma base de datos de Supabase, lo que permite cambios inmediatos entre las dos instancias.
+
+## Base de datos
+
+El esquema SQL (`supabase/schema.sql`) crea tablas para contenido, administradores e imágenes, con políticas RLS que garantizan:
+- Lectura pública del contenido publicado.
+- Operaciones de escritura solo para administradores autenticados.
+- Almacenamiento seguro de imágenes en bucket público con control de carga.
+
+Ejecuta el script completo en el SQL Editor de Supabase después de crear el proyecto.
