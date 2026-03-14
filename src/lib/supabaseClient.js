@@ -17,3 +17,4 @@ export const supabase = hasSupabaseConfig
 
 export const supabaseContentTable = import.meta.env.VITE_SUPABASE_CONTENT_TABLE || 'portfolio_content'
 export const supabaseContentId = import.meta.env.VITE_SUPABASE_CONTENT_ID || 'main'
+export const supabaseImageBucket = import.meta.env.VITE_SUPABASE_IMAGE_BUCKET || 'portfolio-art'

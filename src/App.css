@@ -653,6 +653,13 @@
   font-size: 0.72rem;
 }
 
+.editor-help {
+  margin: -2px 0 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
 .editor-field input,
 .editor-field select,
 .editor-field textarea {

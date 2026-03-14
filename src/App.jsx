@@ -6,6 +6,7 @@ import {
   supabase,
   supabaseContentId,
   supabaseContentTable,
+  supabaseImageBucket,
 } from './lib/supabaseClient'
 
 const editorEnabled = import.meta.env.VITE_ENABLE_EDITOR === 'true'
@@ -84,6 +85,18 @@ function normalizeContent(content) {
 }
 
 const defaultContent = normalizeContent(portfolioContent)
+
+function buildImageStoragePath(fileName = 'image.jpg') {
+  const parts = fileName.split('.')
+  const extensionRaw = parts.length > 1 ? parts.pop() : 'jpg'
+  const baseRaw = parts.join('.') || 'image'
+
+  const extension = String(extensionRaw).toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
+  const base = baseRaw.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '') || 'image'
+  const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+  return `cards/${uniqueId}-${base}.${extension}`
+}
 
 function BrandAsset() {
   const [fallback, setFallback] = useState(false)
@@ -192,6 +205,8 @@ function App() {
   const [editingIndex, setEditingIndex] = useState(null)
   const [draftWork, setDraftWork] = useState(emptyWork)
   const [editorMessage, setEditorMessage] = useState('')
+  const [isUploadingNewImage, setIsUploadingNewImage] = useState(false)
+  const [isUploadingDraftImage, setIsUploadingDraftImage] = useState(false)
 
   useEffect(() => {
     let ignore = false
@@ -276,6 +291,80 @@ function App() {
   const handleDraftChange = (event) => {
     const { name, value } = event.target
     setDraftWork((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const uploadImageFile = async (file) => {
+    if (!supabase || !session) {
+      throw new Error('Inicia sesion para subir imagenes.')
+    }
+
+    if (!file || !file.type.startsWith('image/')) {
+      throw new Error('Selecciona un archivo de imagen valido.')
+    }
+
+    const storagePath = buildImageStoragePath(file.name)
+    const { error: uploadError } = await supabase.storage.from(supabaseImageBucket).upload(storagePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+    })
+
+    if (uploadError) {
+      throw new Error(uploadError.message)
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(supabaseImageBucket).getPublicUrl(storagePath)
+
+    if (!publicUrl) {
+      throw new Error('No se pudo obtener la URL publica de la imagen.')
+    }
+
+    return publicUrl
+  }
+
+  const handleNewImageUpload = async (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      return
+    }
+
+    setIsUploadingNewImage(true)
+    setEditorMessage('Subiendo imagen para la nueva obra...')
+
+    try {
+      const publicUrl = await uploadImageFile(file)
+      setNewWork((prev) => ({ ...prev, image: publicUrl }))
+      setEditorMessage(`Imagen subida: ${file.name}`)
+    } catch (error) {
+      setEditorMessage(`No se pudo subir la imagen: ${error.message}`)
+    } finally {
+      setIsUploadingNewImage(false)
+      event.target.value = ''
+    }
+  }
+
+  const handleDraftImageUpload = async (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      return
+    }
+
+    setIsUploadingDraftImage(true)
+    setEditorMessage('Subiendo imagen para la obra en edicion...')
+
+    try {
+      const publicUrl = await uploadImageFile(file)
+      setDraftWork((prev) => ({ ...prev, image: publicUrl }))
+      setEditorMessage(`Imagen subida: ${file.name}`)
+    } catch (error) {
+      setEditorMessage(`No se pudo subir la imagen: ${error.message}`)
+    } finally {
+      setIsUploadingDraftImage(false)
+      event.target.value = ''
+    }
   }
 
   const handleAddWork = (event) => {
@@ -651,13 +740,26 @@ function App() {
                       </label>
 
                       <label className="editor-field editor-field--full">
-                        <span>Imagen</span>
+                        <span>Imagen (URL)</span>
                         <input
                           name="image"
                           placeholder="/art/nueva-obra.png"
                           value={newWork.image}
                           onChange={handleNewWorkChange}
                         />
+                      </label>
+
+                      <label className="editor-field editor-field--full">
+                        <span>Subir imagen</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleNewImageUpload}
+                          disabled={isUploadingNewImage}
+                        />
+                        <small className="editor-help">
+                          Sube una imagen y la URL se completa automaticamente en el campo de arriba.
+                        </small>
                       </label>
 
                       <label className="editor-field editor-field--full">
@@ -720,8 +822,21 @@ function App() {
                                 </label>
 
                                 <label className="editor-field editor-field--full">
-                                  <span>Imagen</span>
+                                  <span>Imagen (URL)</span>
                                   <input name="image" value={draftWork.image} onChange={handleDraftChange} />
+                                </label>
+
+                                <label className="editor-field editor-field--full">
+                                  <span>Subir imagen</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleDraftImageUpload}
+                                    disabled={isUploadingDraftImage}
+                                  />
+                                  <small className="editor-help">
+                                    Reemplaza la imagen actual subiendo un nuevo archivo.
+                                  </small>
                                 </label>
 
                                 <label className="editor-field editor-field--full">

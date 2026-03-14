@@ -70,6 +70,68 @@ create policy "admins can read admin list"
     )
   );
 
+-- Storage bucket for card images uploaded from admin panel.
+insert into storage.buckets (id, name, public)
+values ('portfolio-art', 'portfolio-art', true)
+on conflict (id) do update set public = excluded.public;
+
+drop policy if exists "public can read portfolio images" on storage.objects;
+create policy "public can read portfolio images"
+  on storage.objects
+  for select
+  to anon, authenticated
+  using (bucket_id = 'portfolio-art');
+
+drop policy if exists "admins can upload portfolio images" on storage.objects;
+create policy "admins can upload portfolio images"
+  on storage.objects
+  for insert
+  to authenticated
+  with check (
+    bucket_id = 'portfolio-art'
+    and exists (
+      select 1
+      from public.portfolio_admins admins
+      where admins.email = auth.jwt() ->> 'email'
+    )
+  );
+
+drop policy if exists "admins can update portfolio images" on storage.objects;
+create policy "admins can update portfolio images"
+  on storage.objects
+  for update
+  to authenticated
+  using (
+    bucket_id = 'portfolio-art'
+    and exists (
+      select 1
+      from public.portfolio_admins admins
+      where admins.email = auth.jwt() ->> 'email'
+    )
+  )
+  with check (
+    bucket_id = 'portfolio-art'
+    and exists (
+      select 1
+      from public.portfolio_admins admins
+      where admins.email = auth.jwt() ->> 'email'
+    )
+  );
+
+drop policy if exists "admins can delete portfolio images" on storage.objects;
+create policy "admins can delete portfolio images"
+  on storage.objects
+  for delete
+  to authenticated
+  using (
+    bucket_id = 'portfolio-art'
+    and exists (
+      select 1
+      from public.portfolio_admins admins
+      where admins.email = auth.jwt() ->> 'email'
+    )
+  );
+
 -- Add your friend's email as admin (change this value first).
 insert into public.portfolio_admins (email)
 values ('friend@example.com')

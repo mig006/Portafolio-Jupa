@@ -13,6 +13,7 @@ Sitio hecho con React + Vite.
 - El publico ve contenido publicado desde Supabase.
 - El panel Admin (edicion) solo aparece si VITE_ENABLE_EDITOR=true.
 - Tu amigo entra con email y contraseña de Supabase, edita cards y pulsa Publicar cambios.
+- En cada card puede subir su propia imagen desde el panel (sin escribir rutas manuales).
 - Lo publicado se ve en la URL publica para todos.
 
 ## Variables de entorno
@@ -24,6 +25,7 @@ Copia .env.example a .env.local y configura:
 - VITE_SUPABASE_ANON_KEY=...
 - VITE_SUPABASE_CONTENT_TABLE=portfolio_content
 - VITE_SUPABASE_CONTENT_ID=main
+- VITE_SUPABASE_IMAGE_BUCKET=portfolio-art
 
 ## Setup de Supabase
 
