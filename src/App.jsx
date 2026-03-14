@@ -207,6 +207,7 @@ function App() {
   const [editorMessage, setEditorMessage] = useState('')
   const [isUploadingNewImage, setIsUploadingNewImage] = useState(false)
   const [isUploadingDraftImage, setIsUploadingDraftImage] = useState(false)
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
 
   useEffect(() => {
     let ignore = false
@@ -525,6 +526,14 @@ function App() {
     setEditorMessage('Cambios publicados para todos los visitantes.')
   }
 
+  const toggleMobileNav = () => {
+    setIsMobileNavOpen((prev) => !prev)
+  }
+
+  const closeMobileNav = () => {
+    setIsMobileNavOpen(false)
+  }
+
   return (
     <div className="page-shell">
       <header className="topbar">
@@ -536,13 +545,34 @@ function App() {
           </div>
         </a>
 
-        <nav className="main-nav" aria-label="Navegación principal">
-          <a href="#obras">Obras</a>
-          {editorEnabled && <a href="#editor">Admin</a>}
-          <a href="#sobre">Perfil</a>
-          <a href="#contacto">Contacto</a>
-          <a href="#youtube">YouTube</a>
-        </nav>
+        <div className="topbar-nav">
+          <button
+            type="button"
+            className={`nav-toggle${isMobileNavOpen ? ' nav-toggle--open' : ''}`}
+            aria-expanded={isMobileNavOpen}
+            aria-controls="main-nav"
+            onClick={toggleMobileNav}
+          >
+            <span>Menu</span>
+            <span className="nav-toggle-icon" aria-hidden="true"></span>
+          </button>
+
+          <nav
+            id="main-nav"
+            className={`main-nav${isMobileNavOpen ? ' main-nav--open' : ''}`}
+            aria-label="Navegación principal"
+          >
+            <a href="#obras" onClick={closeMobileNav}>Obras</a>
+            {editorEnabled && (
+              <a href="#editor" onClick={closeMobileNav}>
+                Admin
+              </a>
+            )}
+            <a href="#sobre" onClick={closeMobileNav}>Perfil</a>
+            <a href="#contacto" onClick={closeMobileNav}>Contacto</a>
+            <a href="#youtube" onClick={closeMobileNav}>YouTube</a>
+          </nav>
+        </div>
       </header>
 
       <main>
