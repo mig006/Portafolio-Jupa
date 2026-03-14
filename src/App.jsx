@@ -1,117 +1,102 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
+import portfolioContent from './data/portfolioContent.json'
+import {
+  hasSupabaseConfig,
+  supabase,
+  supabaseContentId,
+  supabaseContentTable,
+  supabaseImageBucket,
+} from './lib/supabaseClient'
 
-const featuredWorks = [
-  {
-    title: 'Nacido verde',
-    year: '2026',
-    format: 'Afiche / collage',
-    note: 'Devoción popular, tipografía comprimida y color de estadio.',
-    image: '/art/nacido-verde.png',
-    tone: 'acid',
-  },
-  {
-    title: 'Figura en ventana',
-    year: '2025',
-    format: 'Pintura',
-    note: 'Silencio tenso, gesto suspendido y escena de barrio.',
-    image: '/art/figura-ventana.png',
-    tone: 'storm',
-  },
-  {
-    title: 'Bestiario calabaza',
-    year: '2025',
-    format: 'Ilustración',
-    note: 'Línea negra, humor siniestro y personaje de feria.',
-    image: '/art/bestiario-calabaza.png',
-    tone: 'ember',
-  },
-  {
-    title: 'Ritual de ceniza',
-    year: '2025',
-    format: 'Print',
-    note: 'Figura cadavérica, símbolos totémicos y contraste brutal.',
-    image: '/art/ritual-ceniza.png',
-    tone: 'lava',
-  },
-  {
-    title: 'Hike demon',
-    year: '2025',
-    format: 'Sticker / character',
-    note: 'Bestia magenta con acentos tóxicos y postura torcida.',
-    image: '/art/hike-demon.png',
-    tone: 'toxic',
-  },
-  {
-    title: 'Mirada violeta',
-    year: '2024',
-    format: 'Retrato digital',
-    note: 'Brillo espectral, piel nocturna y expresión cerrada.',
-    image: '/art/mirada-violeta.png',
-    tone: 'violet',
-  },
-  {
-    title: 'Gemelos ciegos',
-    year: '2024',
-    format: 'Serie de personajes',
-    note: 'Infancia inquietante con color plano y gestos afilados.',
-    image: '/art/gemelos-ciegos.png',
-    tone: 'bubble',
-  },
-  {
-    title: 'Intervención urbana',
-    year: '2024',
-    format: 'Mural / objeto',
-    note: 'Escala pública, distorsión monstruosa y presencia callejera.',
-    image: '/art/intervencion-urbana.png',
-    tone: 'sky',
-  },
-]
+const editorEnabled = import.meta.env.VITE_ENABLE_EDITOR === 'true'
 
-const capabilities = [
-  'Ilustración editorial',
-  'Personajes y monstruos',
-  'Stickers, prints y afiches',
-]
+const toneOptions = ['acid', 'storm', 'ember', 'lava', 'toxic', 'violet', 'bubble', 'sky']
 
-const process = [
-  'Concepto rápido con referencias, ritmo visual y paleta.',
-  'Bocetos y dirección de personaje o composición.',
-  'Entrega lista para red, print o montaje físico.',
-]
-
-const youtubeChannel = {
-  name: 'Pablito',
-  handle: '@pablito.d0cx',
-  url: 'https://www.youtube.com/@pablito.d0cx/videos',
+const emptyWork = {
+  title: '',
+  year: '',
+  format: '',
+  note: '',
+  image: '',
+  tone: toneOptions[0],
 }
 
-const youtubeVideos = [
-  {
-    title: 'mi vida durante Enero',
-    duration: '6:37',
-    meta: 'Video mensual',
-    image: '/art/yt-enero.jpg',
-    month: 'enero',
-    url: 'https://www.youtube.com/watch?v=1aFqYiFUD28&t=6s',
-  },
-  {
-    title: 'mi vida durante Febrero',
-    duration: '14:08',
-    meta: 'Video mensual',
-    image: '/art/yt-febrero.jpg',
-    month: 'febrero',
-    url: 'https://www.youtube.com/watch?v=dYTlKRXqU1E&t=312s',
-  },
-  {
-    title: 'mi vida durante Marzo',
-    duration: '40:52',
-    meta: 'Video mensual',
-    image: '/art/yt-marzo.jpg',
-    month: 'marzo',
-    url: 'https://www.youtube.com/watch?v=_o5l8CGg0xs&t=1601s',
-  },
-]
+function normalizeWork(work, index) {
+  const title = typeof work?.title === 'string' ? work.title.trim() : ''
+  const year = typeof work?.year === 'string' ? work.year.trim() : String(work?.year ?? '')
+  const format = typeof work?.format === 'string' ? work.format.trim() : ''
+  const note = typeof work?.note === 'string' ? work.note.trim() : ''
+  const image = typeof work?.image === 'string' ? work.image.trim() : ''
+  const tone = toneOptions.includes(work?.tone) ? work.tone : toneOptions[0]
+
+  return {
+    title: title || `Obra ${index + 1}`,
+    year,
+    format,
+    note,
+    image,
+    tone,
+  }
+}
+
+function normalizeContent(content) {
+  const fallback = portfolioContent
+
+  const worksSource =
+    Array.isArray(content?.featuredWorks) && content.featuredWorks.length > 0
+      ? content.featuredWorks
+      : fallback.featuredWorks
+
+  const capabilities = Array.isArray(content?.capabilities)
+    ? content.capabilities.filter((item) => typeof item === 'string' && item.trim())
+    : fallback.capabilities
+
+  const process = Array.isArray(content?.process)
+    ? content.process.filter((item) => typeof item === 'string' && item.trim())
+    : fallback.process
+
+  const youtubeChannel = {
+    name:
+      typeof content?.youtubeChannel?.name === 'string'
+        ? content.youtubeChannel.name
+        : fallback.youtubeChannel.name,
+    handle:
+      typeof content?.youtubeChannel?.handle === 'string'
+        ? content.youtubeChannel.handle
+        : fallback.youtubeChannel.handle,
+    url:
+      typeof content?.youtubeChannel?.url === 'string'
+        ? content.youtubeChannel.url
+        : fallback.youtubeChannel.url,
+  }
+
+  const youtubeVideos = Array.isArray(content?.youtubeVideos)
+    ? content.youtubeVideos
+    : fallback.youtubeVideos
+
+  return {
+    featuredWorks: worksSource.map(normalizeWork),
+    capabilities,
+    process,
+    youtubeChannel,
+    youtubeVideos,
+  }
+}
+
+const defaultContent = normalizeContent(portfolioContent)
+
+function buildImageStoragePath(fileName = 'image.jpg') {
+  const parts = fileName.split('.')
+  const extensionRaw = parts.length > 1 ? parts.pop() : 'jpg'
+  const baseRaw = parts.join('.') || 'image'
+
+  const extension = String(extensionRaw).toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
+  const base = baseRaw.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '') || 'image'
+  const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+  return `cards/${uniqueId}-${base}.${extension}`
+}
 
 function BrandAsset() {
   const [fallback, setFallback] = useState(false)
@@ -205,6 +190,350 @@ function YouTubeCard({ video }) {
 }
 
 function App() {
+  const [content, setContent] = useState(defaultContent)
+  const [featuredWorks, setFeaturedWorks] = useState(defaultContent.featuredWorks)
+  const [isLoadingContent, setIsLoadingContent] = useState(hasSupabaseConfig)
+  const [contentMessage, setContentMessage] = useState('')
+
+  const [session, setSession] = useState(null)
+  const [authValues, setAuthValues] = useState({ email: '', password: '' })
+  const [authMessage, setAuthMessage] = useState('')
+  const [isAuthenticating, setIsAuthenticating] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
+
+  const [newWork, setNewWork] = useState(emptyWork)
+  const [editingIndex, setEditingIndex] = useState(null)
+  const [draftWork, setDraftWork] = useState(emptyWork)
+  const [editorMessage, setEditorMessage] = useState('')
+  const [isUploadingNewImage, setIsUploadingNewImage] = useState(false)
+  const [isUploadingDraftImage, setIsUploadingDraftImage] = useState(false)
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
+
+  useEffect(() => {
+    let ignore = false
+
+    const loadPublishedContent = async () => {
+      if (!hasSupabaseConfig || !supabase) {
+        setIsLoadingContent(false)
+        return
+      }
+
+      setIsLoadingContent(true)
+
+      const { data, error } = await supabase
+        .from(supabaseContentTable)
+        .select('content')
+        .eq('id', supabaseContentId)
+        .maybeSingle()
+
+      if (ignore) {
+        return
+      }
+
+      if (error) {
+        setContentMessage('No se pudo leer Supabase. Se muestra el contenido local.')
+        setIsLoadingContent(false)
+        return
+      }
+
+      const normalized = data?.content ? normalizeContent(data.content) : defaultContent
+      setContent(normalized)
+      setFeaturedWorks(normalized.featuredWorks)
+      setIsLoadingContent(false)
+    }
+
+    loadPublishedContent()
+
+    return () => {
+      ignore = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!editorEnabled || !hasSupabaseConfig || !supabase) {
+      return
+    }
+
+    let ignore = false
+
+    const loadSession = async () => {
+      const {
+        data: { session: currentSession },
+      } = await supabase.auth.getSession()
+
+      if (!ignore) {
+        setSession(currentSession)
+      }
+    }
+
+    loadSession()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession)
+    })
+
+    return () => {
+      ignore = true
+      subscription.unsubscribe()
+    }
+  }, [])
+
+  const isRequiredFieldMissing = (work) => {
+    return !work.title.trim() || !work.year.trim() || !work.format.trim() || !work.image.trim()
+  }
+
+  const handleNewWorkChange = (event) => {
+    const { name, value } = event.target
+    setNewWork((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleDraftChange = (event) => {
+    const { name, value } = event.target
+    setDraftWork((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const uploadImageFile = async (file) => {
+    if (!supabase || !session) {
+      throw new Error('Inicia sesion para subir imagenes.')
+    }
+
+    if (!file || !file.type.startsWith('image/')) {
+      throw new Error('Selecciona un archivo de imagen valido.')
+    }
+
+    const storagePath = buildImageStoragePath(file.name)
+    const { error: uploadError } = await supabase.storage.from(supabaseImageBucket).upload(storagePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+    })
+
+    if (uploadError) {
+      throw new Error(uploadError.message)
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(supabaseImageBucket).getPublicUrl(storagePath)
+
+    if (!publicUrl) {
+      throw new Error('No se pudo obtener la URL publica de la imagen.')
+    }
+
+    return publicUrl
+  }
+
+  const handleNewImageUpload = async (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      return
+    }
+
+    setIsUploadingNewImage(true)
+    setEditorMessage('Subiendo imagen para la nueva obra...')
+
+    try {
+      const publicUrl = await uploadImageFile(file)
+      setNewWork((prev) => ({ ...prev, image: publicUrl }))
+      setEditorMessage(`Imagen subida: ${file.name}`)
+    } catch (error) {
+      setEditorMessage(`No se pudo subir la imagen: ${error.message}`)
+    } finally {
+      setIsUploadingNewImage(false)
+      event.target.value = ''
+    }
+  }
+
+  const handleDraftImageUpload = async (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      return
+    }
+
+    setIsUploadingDraftImage(true)
+    setEditorMessage('Subiendo imagen para la obra en edicion...')
+
+    try {
+      const publicUrl = await uploadImageFile(file)
+      setDraftWork((prev) => ({ ...prev, image: publicUrl }))
+      setEditorMessage(`Imagen subida: ${file.name}`)
+    } catch (error) {
+      setEditorMessage(`No se pudo subir la imagen: ${error.message}`)
+    } finally {
+      setIsUploadingDraftImage(false)
+      event.target.value = ''
+    }
+  }
+
+  const handleAddWork = (event) => {
+    event.preventDefault()
+
+    if (isRequiredFieldMissing(newWork)) {
+      setEditorMessage('Completa titulo, año, formato e imagen para crear el card.')
+      return
+    }
+
+    const normalizedWork = normalizeWork(newWork, featuredWorks.length)
+    setFeaturedWorks((prev) => [...prev, normalizedWork])
+    setNewWork(emptyWork)
+    setEditorMessage(`Card agregado al borrador: ${normalizedWork.title}.`)
+  }
+
+  const startEditingWork = (index) => {
+    setEditingIndex(index)
+    setDraftWork(featuredWorks[index])
+    setEditorMessage('')
+  }
+
+  const cancelEditingWork = () => {
+    setEditingIndex(null)
+    setDraftWork(emptyWork)
+  }
+
+  const saveEditedWork = (event, index) => {
+    event.preventDefault()
+
+    if (isRequiredFieldMissing(draftWork)) {
+      setEditorMessage('Completa titulo, año, formato e imagen para guardar cambios.')
+      return
+    }
+
+    const normalizedWork = normalizeWork(draftWork, index)
+    setFeaturedWorks((prev) => prev.map((work, currentIndex) => (currentIndex === index ? normalizedWork : work)))
+    setEditingIndex(null)
+    setDraftWork(emptyWork)
+    setEditorMessage(`Card editado en borrador: ${normalizedWork.title}.`)
+  }
+
+  const deleteWork = (index) => {
+    const selectedWork = featuredWorks[index]
+
+    if (!selectedWork) {
+      return
+    }
+
+    const confirmed = window.confirm(`Eliminar el card "${selectedWork.title}"?`)
+
+    if (!confirmed) {
+      return
+    }
+
+    setFeaturedWorks((prev) => prev.filter((_, currentIndex) => currentIndex !== index))
+
+    if (editingIndex === index) {
+      setEditingIndex(null)
+      setDraftWork(emptyWork)
+    }
+
+    if (editingIndex !== null && editingIndex > index) {
+      setEditingIndex((prev) => prev - 1)
+    }
+
+    setEditorMessage(`Card eliminado del borrador: ${selectedWork.title}.`)
+  }
+
+  const resetDraftToPublished = () => {
+    setFeaturedWorks(content.featuredWorks.map(normalizeWork))
+    setEditingIndex(null)
+    setDraftWork(emptyWork)
+    setEditorMessage('Borrador restablecido al contenido publicado.')
+  }
+
+  const loadBaseWorks = () => {
+    const confirmed = window.confirm('Reemplazar el borrador por las obras base del JSON local?')
+
+    if (!confirmed) {
+      return
+    }
+
+    setFeaturedWorks(defaultContent.featuredWorks.map(normalizeWork))
+    setEditingIndex(null)
+    setDraftWork(emptyWork)
+    setEditorMessage('Borrador cargado desde el JSON base.')
+  }
+
+  const handleAuthFieldChange = (event) => {
+    const { name, value } = event.target
+    setAuthValues((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSignIn = async (event) => {
+    event.preventDefault()
+
+    if (!supabase) {
+      return
+    }
+
+    setIsAuthenticating(true)
+    setAuthMessage('')
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: authValues.email,
+      password: authValues.password,
+    })
+
+    setIsAuthenticating(false)
+
+    if (error) {
+      setAuthMessage(error.message)
+      return
+    }
+
+    setFeaturedWorks(content.featuredWorks.map(normalizeWork))
+    setAuthMessage('Sesion iniciada. Ya puedes editar y publicar.')
+  }
+
+  const handleSignOut = async () => {
+    if (!supabase) {
+      return
+    }
+
+    await supabase.auth.signOut()
+    setFeaturedWorks(content.featuredWorks.map(normalizeWork))
+    setEditingIndex(null)
+    setDraftWork(emptyWork)
+    setEditorMessage('')
+    setAuthMessage('Sesion cerrada.')
+  }
+
+  const handlePublishChanges = async () => {
+    if (!supabase || !session) {
+      return
+    }
+
+    setIsPublishing(true)
+
+    const nextContent = {
+      ...content,
+      featuredWorks: featuredWorks.map(normalizeWork),
+    }
+
+    const { error } = await supabase
+      .from(supabaseContentTable)
+      .upsert({ id: supabaseContentId, content: nextContent }, { onConflict: 'id' })
+
+    setIsPublishing(false)
+
+    if (error) {
+      setEditorMessage(`No se pudo publicar: ${error.message}`)
+      return
+    }
+
+    setContent(nextContent)
+    setEditorMessage('Cambios publicados para todos los visitantes.')
+  }
+
+  const toggleMobileNav = () => {
+    setIsMobileNavOpen((prev) => !prev)
+  }
+
+  const closeMobileNav = () => {
+    setIsMobileNavOpen(false)
+  }
+
   return (
     <div className="page-shell">
       <header className="topbar">
@@ -216,12 +545,34 @@ function App() {
           </div>
         </a>
 
-        <nav className="main-nav" aria-label="Navegación principal">
-          <a href="#obras">Obras</a>
-          <a href="#sobre">Perfil</a>
-          <a href="#contacto">Contacto</a>
-          <a href="#youtube">YouTube</a>
-        </nav>
+        <div className="topbar-nav">
+          <button
+            type="button"
+            className={`nav-toggle${isMobileNavOpen ? ' nav-toggle--open' : ''}`}
+            aria-expanded={isMobileNavOpen}
+            aria-controls="main-nav"
+            onClick={toggleMobileNav}
+          >
+            <span>Menu</span>
+            <span className="nav-toggle-icon" aria-hidden="true"></span>
+          </button>
+
+          <nav
+            id="main-nav"
+            className={`main-nav${isMobileNavOpen ? ' main-nav--open' : ''}`}
+            aria-label="Navegación principal"
+          >
+            <a href="#obras" onClick={closeMobileNav}>Obras</a>
+            {editorEnabled && (
+              <a href="#editor" onClick={closeMobileNav}>
+                Admin
+              </a>
+            )}
+            <a href="#sobre" onClick={closeMobileNav}>Perfil</a>
+            <a href="#contacto" onClick={closeMobileNav}>Contacto</a>
+            <a href="#youtube" onClick={closeMobileNav}>YouTube</a>
+          </nav>
+        </div>
       </header>
 
       <main>
@@ -257,7 +608,7 @@ function App() {
                 comisiones y colaboraciones.
               </p>
               <div className="capability-row">
-                {capabilities.map((item) => (
+                {content.capabilities.map((item) => (
                   <span key={item}>{item}</span>
                 ))}
               </div>
@@ -296,14 +647,284 @@ function App() {
           <div className="section-heading">
             <p className="eyebrow">Seleccionada</p>
             <h2>Obras recientes</h2>
+            {isLoadingContent && <p className="sync-note">Cargando contenido publicado...</p>}
+            {contentMessage && <p className="sync-note sync-note--warning">{contentMessage}</p>}
           </div>
 
           <div className="gallery-grid">
             {featuredWorks.map((work, index) => (
-              <WorkCard key={work.title} work={work} index={index} />
+              <WorkCard key={`${work.title}-${index}`} work={work} index={index} />
             ))}
           </div>
         </section>
+
+        {editorEnabled && (
+          <section className="editor-section" id="editor">
+            <div className="section-heading">
+              <p className="eyebrow">Admin</p>
+              <h2>Panel privado para publicar cambios</h2>
+              <p>
+                Solo usuarios con cuenta en Supabase pueden entrar y publicar.
+                Lo publicado aqui se refleja en la web publica.
+              </p>
+            </div>
+
+            {!hasSupabaseConfig && (
+              <div className="editor-warning">
+                Faltan variables de Supabase en el entorno. Configura VITE_SUPABASE_URL y
+                VITE_SUPABASE_ANON_KEY.
+              </div>
+            )}
+
+            {hasSupabaseConfig && !session && (
+              <form className="auth-form" onSubmit={handleSignIn}>
+                <h3>Iniciar sesion</h3>
+                <p>Usa el usuario de tu amigo para abrir el editor.</p>
+
+                <label className="editor-field">
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    name="email"
+                    value={authValues.email}
+                    onChange={handleAuthFieldChange}
+                    required
+                  />
+                </label>
+
+                <label className="editor-field">
+                  <span>Contraseña</span>
+                  <input
+                    type="password"
+                    name="password"
+                    value={authValues.password}
+                    onChange={handleAuthFieldChange}
+                    required
+                  />
+                </label>
+
+                <div className="editor-actions">
+                  <button type="submit" className="button button--primary" disabled={isAuthenticating}>
+                    {isAuthenticating ? 'Entrando...' : 'Entrar al panel'}
+                  </button>
+                </div>
+
+                {authMessage && <p className="editor-message">{authMessage}</p>}
+              </form>
+            )}
+
+            {hasSupabaseConfig && session && (
+              <>
+                <div className="editor-toolbar">
+                  <p>
+                    Sesion activa: <strong>{session.user?.email || 'usuario'}</strong>
+                  </p>
+
+                  <div className="editor-toolbar-actions">
+                    <button
+                      type="button"
+                      className="button button--primary"
+                      onClick={handlePublishChanges}
+                      disabled={isPublishing}
+                    >
+                      {isPublishing ? 'Publicando...' : 'Publicar cambios'}
+                    </button>
+                    <button type="button" className="button button--ghost" onClick={resetDraftToPublished}>
+                      Descartar borrador
+                    </button>
+                    <button type="button" className="button button--ghost" onClick={handleSignOut}>
+                      Cerrar sesion
+                    </button>
+                  </div>
+                </div>
+
+                <div className="editor-layout">
+                  <form className="editor-form" onSubmit={handleAddWork}>
+                    <h3>Agregar nueva obra</h3>
+
+                    <div className="editor-fields">
+                      <label className="editor-field">
+                        <span>Titulo</span>
+                        <input name="title" value={newWork.title} onChange={handleNewWorkChange} />
+                      </label>
+
+                      <label className="editor-field">
+                        <span>Año</span>
+                        <input name="year" value={newWork.year} onChange={handleNewWorkChange} />
+                      </label>
+
+                      <label className="editor-field">
+                        <span>Formato</span>
+                        <input name="format" value={newWork.format} onChange={handleNewWorkChange} />
+                      </label>
+
+                      <label className="editor-field">
+                        <span>Tone</span>
+                        <select name="tone" value={newWork.tone} onChange={handleNewWorkChange}>
+                          {toneOptions.map((tone) => (
+                            <option key={tone} value={tone}>
+                              {tone}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label className="editor-field editor-field--full">
+                        <span>Imagen (URL)</span>
+                        <input
+                          name="image"
+                          placeholder="/art/nueva-obra.png"
+                          value={newWork.image}
+                          onChange={handleNewWorkChange}
+                        />
+                      </label>
+
+                      <label className="editor-field editor-field--full">
+                        <span>Subir imagen</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleNewImageUpload}
+                          disabled={isUploadingNewImage}
+                        />
+                        <small className="editor-help">
+                          Sube una imagen y la URL se completa automaticamente en el campo de arriba.
+                        </small>
+                      </label>
+
+                      <label className="editor-field editor-field--full">
+                        <span>Descripcion</span>
+                        <textarea
+                          name="note"
+                          rows={3}
+                          value={newWork.note}
+                          onChange={handleNewWorkChange}
+                        />
+                      </label>
+                    </div>
+
+                    <div className="editor-actions">
+                      <button type="submit" className="button button--primary">
+                        Agregar card al borrador
+                      </button>
+
+                      <button type="button" className="button button--ghost" onClick={loadBaseWorks}>
+                        Cargar obras base (JSON)
+                      </button>
+                    </div>
+
+                    {editorMessage && <p className="editor-message">{editorMessage}</p>}
+                  </form>
+
+                  <div className="editor-list">
+                    <h3>Borrador actual ({featuredWorks.length})</h3>
+
+                    <ul>
+                      {featuredWorks.map((work, index) => (
+                        <li key={`${work.title}-${index}`} className="editor-item">
+                          {editingIndex === index ? (
+                            <form className="editor-edit-form" onSubmit={(event) => saveEditedWork(event, index)}>
+                              <div className="editor-edit-grid">
+                                <label className="editor-field">
+                                  <span>Titulo</span>
+                                  <input name="title" value={draftWork.title} onChange={handleDraftChange} />
+                                </label>
+
+                                <label className="editor-field">
+                                  <span>Año</span>
+                                  <input name="year" value={draftWork.year} onChange={handleDraftChange} />
+                                </label>
+
+                                <label className="editor-field">
+                                  <span>Formato</span>
+                                  <input name="format" value={draftWork.format} onChange={handleDraftChange} />
+                                </label>
+
+                                <label className="editor-field">
+                                  <span>Tone</span>
+                                  <select name="tone" value={draftWork.tone} onChange={handleDraftChange}>
+                                    {toneOptions.map((tone) => (
+                                      <option key={tone} value={tone}>
+                                        {tone}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </label>
+
+                                <label className="editor-field editor-field--full">
+                                  <span>Imagen (URL)</span>
+                                  <input name="image" value={draftWork.image} onChange={handleDraftChange} />
+                                </label>
+
+                                <label className="editor-field editor-field--full">
+                                  <span>Subir imagen</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleDraftImageUpload}
+                                    disabled={isUploadingDraftImage}
+                                  />
+                                  <small className="editor-help">
+                                    Reemplaza la imagen actual subiendo un nuevo archivo.
+                                  </small>
+                                </label>
+
+                                <label className="editor-field editor-field--full">
+                                  <span>Descripcion</span>
+                                  <textarea
+                                    name="note"
+                                    rows={3}
+                                    value={draftWork.note}
+                                    onChange={handleDraftChange}
+                                  />
+                                </label>
+                              </div>
+
+                              <div className="editor-edit-actions">
+                                <button type="submit" className="editor-mini-button">
+                                  Guardar
+                                </button>
+                                <button type="button" className="editor-mini-button" onClick={cancelEditingWork}>
+                                  Cancelar
+                                </button>
+                              </div>
+                            </form>
+                          ) : (
+                            <div className="editor-item-view">
+                              <div>
+                                <strong>{work.title}</strong>
+                                <p>
+                                  {work.year} - {work.format}
+                                </p>
+                              </div>
+
+                              <div className="editor-item-actions">
+                                <button
+                                  type="button"
+                                  className="editor-mini-button"
+                                  onClick={() => startEditingWork(index)}
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  type="button"
+                                  className="editor-mini-button editor-mini-button--danger"
+                                  onClick={() => deleteWork(index)}
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </>
+            )}
+          </section>
+        )}
 
         <section className="story-section" id="sobre">
           <article className="story-card story-card--large">
@@ -325,7 +946,7 @@ function App() {
             <p className="eyebrow">Proceso</p>
             <h2>Cómo se desarrolla una pieza</h2>
             <ul className="stack-list">
-              {process.map((item) => (
+              {content.process.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
@@ -367,20 +988,20 @@ function App() {
           <div className="youtube-head">
             <div>
               <p className="eyebrow">Canal</p>
-              <h2>YouTube de {youtubeChannel.name}</h2>
+              <h2>YouTube de {content.youtubeChannel.name}</h2>
               <p>
                 Una muestra de 3 videos del canal de YouTube, donde se documenta el proceso creativo, la vida diaria y los proyectos en curso con un estilo directo y sin filtros.
               </p>
             </div>
 
-            <a className="channel-pill" href={youtubeChannel.url} target="_blank" rel="noreferrer">
-              <span>{youtubeChannel.name}</span>
-              <small>{youtubeChannel.handle}</small>
+            <a className="channel-pill" href={content.youtubeChannel.url} target="_blank" rel="noreferrer">
+              <span>{content.youtubeChannel.name}</span>
+              <small>{content.youtubeChannel.handle}</small>
             </a>
           </div>
 
           <div className="youtube-grid">
-            {youtubeVideos.map((video) => (
+            {content.youtubeVideos.map((video) => (
               <YouTubeCard key={video.title} video={video} />
             ))}
           </div>
